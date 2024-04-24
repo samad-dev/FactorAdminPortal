@@ -1,0 +1,628 @@
+<%- contentFor('HeaderCss') %>
+<!-- Daterangepicker css -->
+<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css">
+
+<!-- Vector Map css -->
+<link rel="stylesheet" href="assets/vendor/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+</link>
+<link href="assets/vendor/datatables.net-bs5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-fixedcolumns-bs5/css/fixedColumns.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-fixedheader-bs5/css/fixedHeader.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-select-bs5/css/select.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/quill/quill.core.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/quill/quill.snow.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" type="text/css" />
+
+<%- contentFor('body') %>
+
+<!-- end row -->
+
+
+<div class="row mt-5">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="header-title" class="mb-6" style="font-size: 20px;">Weekly Menu</h1>
+        <br>
+        <!-- <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                            data-bs-target="#top-modal" onclick="clearModalFields()">Add</button> -->
+        <button class="btn btn-primary mt-2 mt-md-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Add</button>
+        <br>
+        <br>
+
+
+        <table id="basic-datatable" class="table table-striped dt-responsive wrap w-100">
+          <thead>
+            <tr>
+              <th>S NO#</th>
+              <th>Name</th>
+              <th>Dish</th>
+
+              <th>From</th>
+              <th>To</th>
+              <th>Created Time</th>
+              <th>Edit</th>
+              <th>Delete</th>
+
+            </tr>
+          </thead>
+
+          <tbody>
+
+
+          </tbody>
+        </table>
+
+      </div> <!-- end card body-->
+    </div> <!-- end card -->
+  </div><!-- end col-->
+</div> <!-- end row-->
+<div class="offcanvas offcanvas-end" style="width: 40%;" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+  <div class="offcanvas-header">
+    <h5 id="offcanvasRightLabel">Add Weekly Menu</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div> <!-- end offcanvas-header-->
+
+  <div class="offcanvas-body">
+    <!-- <form method="post" id="create_Weekly Menu"> -->
+
+
+    <div class="row">
+      <div class="col-6 pb-3">
+
+        <label for="" style="font-size: 16px;">Name</label>
+        <input type="text" class="form-control" id="Name" name="Name">
+
+      </div>
+      <div class="col-6 pb-3">
+        <label for="" style="font-size: 16px;">From</label>
+        <input type="date" class="form-control" id="from_date" name="from_date">
+
+      </div>
+
+      <div class="col-6 pb-3">
+
+        <label for="" style="font-size: 16px;">TO</label>
+        <input type="date" class="form-control" id="to_date" name="to_date">
+
+      </div>
+
+
+      <div class="col-6 pb-3">
+
+        <label for="" style="font-size: 16px;">Dishes</label>
+        <select id="dishes" name="dishes[]" class="select2 form-control select2-multiple" data-toggle="select2" multiple="multiple" data-placeholder="Choose ...">
+
+        </select>
+
+      </div>
+
+
+
+
+
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <button type="button" class="btn btn-primary" style="float: right;" onclick="submit()">Save
+          changes</button>
+      </div>
+
+    </div>
+    <!-- </form> -->
+  </div>
+</div> <!-- end offcanvas-body-->
+</div> <!-- end offcanvas-->
+
+
+
+<%- contentFor('FooterJs') %>
+
+<!-- Vector Map js -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="assets/vendor/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
+<script src="assets/vendor/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="assets/vendor/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js"></script>
+<script src="assets/vendor/datatables.net-fixedcolumns-bs5/js/fixedColumns.bootstrap5.min.js"></script>
+<script src="assets/vendor/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+<script src="assets/vendor/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="assets/vendor/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js"></script>
+<script src="assets/vendor/datatables.net-buttons/js/buttons.html5.min.js"></script>
+<script src="assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
+<script src="assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
+<script src="assets/vendor/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+<script src="assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+<script src="assets/vendor/select2/js/select2.min.js"></script>
+<script src="assets/vendor/quill/quill.min.js"></script>
+
+<!-- Quill Demo js -->
+<!-- <script src="assets/js/pages/demo.quilljs.js"></script> -->
+
+<script>
+  var quill = new Quill('#snow-editor', {
+    theme: 'snow' // You can use other themes as well
+  });
+  $('document').ready(function() {
+    all_selection();
+    // Destroy existing DataTable instance (if it exists)
+    if ($.fn.DataTable.isDataTable('#basic-datatable')) {
+      $('#basic-datatable').DataTable().destroy();
+    }
+
+    $("#basic-datatable").DataTable({
+      // scrollX:!0,
+      keys: true,
+      language: {
+        paginate: {
+          previous: "<i class='ri-arrow-left-s-line'>",
+          next: "<i class='ri-arrow-right-s-line'>"
+        }
+      },
+      drawCallback: function() {
+        $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
+      }
+    });
+    fetch();
+
+  })
+
+  //   $('#create_Weekly Menu').on("submit", function(event) {
+  function submit() {
+    var update_id = $('#hidden').val();
+    // alert(update_id)
+    if (update_id != null) {
+      // alert("Running")
+      var formdata = new FormData();
+      var editorContent = quill.root.innerHTML;
+
+      //   var ingredient_id = $('input[name="ingredient_id[]"]').map(function() {
+      //     return parseInt($(this).val());
+      //   }).get();
+
+      var ingredient_id = [];
+
+      // Get all elements with name="ingredient_id[]"
+      var selectElements = document.querySelectorAll('select[name="ingredient_id[]"]');
+
+      // Iterate through the select elements
+      selectElements.forEach(function(selectElement) {
+        // Push the selected value of each element to the array
+        ingredient_id.push(parseInt(selectElement.value));
+      });
+
+      // Now ingredientIds array contains all the values
+      //   console.log(ingredient_id);
+
+      var ingredient_qty = $('input[name="ingredient_qty[]"]').map(function() {
+        return parseInt($(this).val());
+      }).get();
+      //   var nut_id = $('input[name="nut_id[]"]').map(function() {
+      //     return parseInt($(this).val());
+      //   }).get();
+
+      var nut_id = [];
+
+      // Get all elements with name="nut_id[]"
+      var selectElements = document.querySelectorAll('select[name="nut_id[]"]');
+
+      // Iterate through the select elements
+      selectElements.forEach(function(selectElement) {
+        // Push the selected value of each element to the array
+        nut_id.push(parseInt(selectElement.value));
+      });
+
+      var nut_qty = $('input[name="nut_qty[]"]').map(function() {
+        return parseInt($(this).val());
+      }).get();
+
+      var dishes = $('#dishes').map(function() {
+        return parseInt($(this).val());
+      }).get();
+
+      console.log(ingredient_id)
+      console.log(ingredient_id)
+      console.log(ingredient_qty)
+      console.log(nut_id)
+      console.log(nut_qty)
+
+      var name = $('#Name').val();
+      var calories = $('#calories').val();
+      var instructions = $('#instructions').val();
+      var allergens = $('#allergens').val();
+      var addon = $('#addon').val();
+      var label = $('#label').val();
+
+      console.log(name)
+      console.log(calories)
+      console.log(instructions)
+      console.log(allergens)
+      console.log(addon)
+      console.log(label)
+      console.log(dishes)
+      console.log(editorContent)
+
+
+      var fileInput = $("#fileUpload")[0];
+      var file = fileInput.files[0];
+      console.log(file)
+      formdata.append("dish_name", name);
+      formdata.append("total_calories", calories);
+      formdata.append("description", editorContent);
+      formdata.append("instructions", instructions);
+      formdata.append("allergens", allergens);
+      formdata.append("add_on", addon);
+      formdata.append("label", label);
+      formdata.append("ingredient_id", ingredient_id.join(', '));
+      formdata.append("qty", ingredient_qty.join(', '));
+      formdata.append("nut_id", nut_id.join(', '));
+      formdata.append("nqty", nut_qty.join(', '));
+      formdata.append("prefs", dishes.join(', '));
+      formdata.append("image", file);
+
+      var settings = {
+        "url": "/dish",
+        "method": "POST",
+        "timeout": 0,
+        "processData": false,
+        "mimeType": "multipart/form-data",
+        "contentType": false,
+        "data": formdata
+      };
+
+      $.ajax({
+        ...settings,
+        statusCode: {
+          200: function(response) {
+            console.log(response);
+
+            var jsonObject = JSON.parse(response);
+
+            var status = jsonObject.status;
+            console.log("Status: " + status);
+
+            if (status == 200) {
+              console.log("Request was successful");
+              $('#top-modal').modal('hide');
+              // fetch();
+
+              Swal.fire(
+                'Success!',
+                'Record Created Successfully',
+                'success'
+              )
+              setTimeout(function() {
+
+                location.reload();
+
+
+              }, 2000);
+
+            } else {
+              Swal.fire(
+                'Error!',
+                'Something went wrong. Please try again later.',
+                'error'
+              );
+            }
+          },
+        },
+        success: function(data) {
+          // $('#myModal').reset();
+          // Additional success handling if needed
+        },
+        error: function(xhr, textStatus, errorThrown) {
+          console.log(xhr)
+          Swal.fire(
+            'Server Error!',
+            'Record Not Created',
+            'error'
+          )
+        }
+      });
+    } else {
+      var form = new FormData();
+      form.append("label", document.getElementById("Name").value);
+      form.append("datefrom", document.getElementById("from_date").value);
+      form.append("dateto", document.getElementById("to_date").value);
+      console.log($('#dishes').val());
+      var myString = JSON.stringify($('#dishes').val());
+
+      console.log(myString);
+      form.append("dishes", myString);
+
+
+
+      var settings = {
+        "url": "/week",
+        "method": "POST",
+        "timeout": 0,
+        "processData": false,
+        "mimeType": "multipart/form-data",
+        "contentType": false,
+        "data": form
+      };
+
+      $.ajax({
+        ...settings,
+        success: function(response) {
+          console.log(response);
+
+          var jsonObject = JSON.parse(response);
+
+          var status = jsonObject.status;
+          console.log("Status: " + status);
+
+          if (status == 200) {
+            console.log("Request was successful");
+            $('#top-modal').modal('hide');
+            // fetch();
+
+            Swal.fire(
+              'Success!',
+              'Record Created Successfully',
+              'success'
+            )
+            setTimeout(function() {
+
+              location.reload();
+
+
+            }, 2000);
+
+          } else {
+            Swal.fire(
+              'Error!',
+              'Something went wrong. Please try again later.',
+              'error'
+            );
+          }
+        },
+        error: function(xhr, textStatus, errorThrown) {
+          console.log(xhr);
+          Swal.fire(
+            'Server Error!',
+            'Not Created',
+            'error'
+          );
+        }
+      });
+    }
+    //   });
+  }
+
+  function delete_(id) {
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won\'t be able to revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Perform the delete action here
+        var settings = {
+          "url": "/week/" + id,
+          "method": "DELETE",
+          "timeout": 0,
+        };
+        $.ajax({
+          ...settings,
+          statusCode: {
+            200: function(response) {
+              console.log(response);
+              console.log("Request was successful");
+              $('#top-modal').modal('hide');
+
+              fetch()
+              Swal.fire('Deleted!', 'Deleted Successfully!', 'success');
+              setTimeout(function() {
+
+                location.reload();
+
+
+              }, 2000);
+            },
+          },
+          success: function(data) {
+            // $('#myModal').reset();
+            // Additional success handling if needed
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            console.log(xhr)
+            Swal.fire(
+              'Server Error!',
+              'Not Deleted',
+              'error'
+            )
+          }
+        });
+
+
+      }
+    });
+
+  }
+
+
+  function edit(id) {
+    clearModalFields();
+    var settings = {
+      "url": "/nutrient/" + id,
+      "method": "GET",
+      "timeout": 0,
+    };
+    $.ajax(settings).done(function(response) {
+
+      $('#nutrient').val(response['nutrient']);
+      $('#nutrient_unit').val(response['nutrient_unit']);
+
+    })
+
+    $('#top-modal').modal('show');
+    $('#hidden').val(id);
+
+  }
+
+  function fetch() {
+    var settings = {
+      "url": "/week",
+      "method": "GET",
+      "timeout": 0,
+    };
+    let table = new DataTable('#basic-datatable');
+
+    $.ajax(settings).done(function(response) {
+      console.log(response);
+      table.clear().draw();
+      $.each(response, function(index, data) {
+        table.row.add([
+          index + 1,
+          data.label,
+          data.dish_name,
+          data.datefrom,
+          data.dateto,
+          data.created_at,
+          '<button type="button"id="edit" name="edit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"  onclick="edit(' +
+          data.id +
+          ')"  class="btn btn-soft-secondary "style="padding:5px 10px;" ><i class="ri ri-pencil-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
+          '<button type="button"id="edit" name="edit"  onclick="delete_(' +
+          data.id +
+          ')"  class="btn btn-soft-danger "style="padding:5px 10px;" ><i class="ri  ri-delete-bin-2-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
+        ]).draw(false);
+      });
+    });
+  }
+
+  function clearModalFields() {
+    // Select all input, textarea, and select elements within the modal
+    $('#top-modal :input').each(function() {
+      var elementType = this.type;
+      var elementId = this.id;
+
+      // Handle different input types appropriately
+      switch (elementType) {
+        case 'text':
+        case 'number':
+        case 'file':
+        case 'hidden':
+        case 'textarea':
+        case 'select':
+          $('#' + elementId).val('');
+          break;
+
+          // Add more cases as needed for other input types
+      }
+    });
+  }
+
+
+  // Handle click event of the "Remove" button within a set of fields
+
+
+  // Handle click event of the "Remove" button within a set of fields
+
+
+
+
+  function get_prefs() {
+    // alert("Running")
+    var settings = {
+      "url": "/dish",
+      "method": "GET",
+      "timeout": 0,
+      "headers": {
+        "Cookie": "connect.sid=s%3AagahRgNErPeEdvgvUy9j2-FDGB3eDw8J.GV5P4GUsELqT0NmWFjqyWkoTXf4k0T1ONVXV1V5SjDI"
+      },
+    };
+
+    $.ajax(settings).done(function(response) {
+      console.log(response);
+      $.each(response, function(index, data) {
+
+
+        console.log(data.dishes)
+        $('#dishes').append($('<option>', {
+          value: data.id,
+          text: data.dish_name
+        }));
+
+        $('#dishes').trigger('change.select2');
+      });
+    });
+  }
+
+  function get_ingredient(select_index) {
+    var settings = {
+      "url": "/ingredient",
+      "method": "GET",
+      "timeout": 0,
+    };
+
+    $.ajax(settings).done(function(response) {
+      console.log(response);
+      $('#ingredient_id_' + select_index + '').empty()
+      $('#ingredient_id_' + select_index + '').append($('<option>', {
+        value: '',
+        text: 'Select'
+      }));
+      $.each(response, function(index, data) {
+
+        console.log('#ingredient_id_' + select_index + '')
+
+        console.log(data.ingredient)
+        $('#ingredient_id_' + select_index + '').append($('<option>', {
+          value: data.id,
+          text: data.ingredient
+        }));
+
+        $('#ingredient_id_' + select_index + '').trigger('change.select2');
+      });
+    });
+  }
+
+
+  function get_nut(select_index) {
+    var settings = {
+      "url": "/nutrient",
+      "method": "GET",
+      "timeout": 0,
+    };
+
+    $.ajax(settings).done(function(response) {
+      console.log(response);
+      $('#nut_id_' + select_index + '').empty()
+      $('#nut_id_' + select_index + '').append($('<option>', {
+        value: '',
+        text: 'Select'
+      }));
+      $.each(response, function(index, data) {
+
+        console.log('#nut_id_' + select_index + '')
+
+        console.log(data.nutrient)
+        $('#nut_id_' + select_index + '').append($('<option>', {
+          value: data.id,
+          text: data.nutrient
+        }));
+
+        $('#nut_id_' + select_index + '').trigger('change.select2');
+      });
+    });
+  }
+
+
+  function all_selection() {
+    get_prefs();
+    get_ingredient(0);
+    get_nut(0);
+
+  }
+</script>

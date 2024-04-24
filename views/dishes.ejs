@@ -1,0 +1,67 @@
+<%- contentFor('HeaderCss') %>
+<!-- Daterangepicker css -->
+<link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css">
+
+<!-- Vector Map css -->
+<link rel="stylesheet" href="assets/vendor/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<%- contentFor('body') %>
+
+<!-- end row -->
+
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="header-title" class="mb-6" style="font-size: 20px;">Preference</h1>
+                <br>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#top-modal">Add</button>
+                <br>
+                <br>
+
+
+                <table id="basic-datatable" class="table table-striped dt-responsive nowrap w-100">
+                    <thead>
+                       
+                    </thead>         
+                
+                    <tbody>
+                        
+                        
+                    </tbody>
+                </table> 
+
+            </div> <!-- end card body-->
+        </div> <!-- end card -->
+    </div><!-- end col-->
+</div> <!-- end row-->
+
+
+<div id="top-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="topModalLabel">Add Preference</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <label for="">Preference</label>
+               <input type="text" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div
+
+<%- contentFor('FooterJs') %>
+
+<!-- Vector Map js -->
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script>
+
+let table = new DataTable('#basic-datatable');
+</script>
