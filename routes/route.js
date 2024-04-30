@@ -2,11 +2,17 @@ const express = require('express');
 const mysql = require('mysql2');
 const cron = require('node-cron');
 const route = express.Router();
+const paypal = require('paypal-rest-sdk');
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
     database: 'factor75',
+});
+paypal.configure({
+    'mode': 'sandbox', // Change this to 'live' for production
+    'client_id': 'AYz9PbljI5gkrCNp00ijbMLmHeEGNG97B4OB0cGFKiWz5XVHu1IS6MjYpQmfolqHk_kf0oclcTGiWDJz',
+    'client_secret': 'EF7gEgplYke3iMX-OqUqarMzS9GwDRrLOwrqp--Ng-7KYhrmXcN-MhBbzlFdKGG4x4-QGnaq9oRgqPYs'
 });
 
 
@@ -14,11 +20,11 @@ const nodemailer = require('nodemailer');
 
 // Create a transporter using SMTP or other transport mechanisms
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Change this to your email service provider
-  auth: {
-    user: 'abdulsamadq67@gmail.com', // Your email address
-    pass: 'fuylxituupmxupny' // Your email password or application-specific password
-  }
+    service: 'gmail', // Change this to your email service provider
+    auth: {
+        user: 'abdulsamadq67@gmail.com', // Your email address
+        pass: 'fuylxituupmxupny' // Your email password or application-specific password
+    }
 });
 
 
@@ -30,6 +36,69 @@ db.connect((err) => {
     console.log('Connected to MySQL database');
 });
 
+route.get('/pay', (req, res) => {
+    const billingPlanAttributes = {
+        "name": "Weekly Subscription",
+        "description": "Recurring payment of $10 per week",
+        "type": "INFINITE",
+        "payment_definitions": [{
+            "name": "Regular Payment",
+            "type": "REGULAR",
+            "frequency": "WEEK",
+            "frequency_interval": "1",
+            "amount": {
+                "value": "10",
+                "currency": "USD"
+            },
+            "cycles": "0",
+        }],
+        "merchant_preferences": {
+            "auto_bill_amount": "YES",
+            "initial_fail_amount_action": "CONTINUE",
+            "max_fail_attempts": "3",
+            "return_url": "http://example.com/success",
+            "cancel_url": "http://example.com/cancel"
+        }
+    };
+    paypal.billingPlan.create(billingPlanAttributes, (error, billingPlan) => {
+        if (error) {
+            console.error(error);
+        } else {
+            console.log("Billing plan created:", billingPlan);
+            // Activate the billing plan
+            paypal.billingPlan.update(billingPlan.id, [{ "op": "replace", "path": "/", "value": { "state": "ACTIVE" } }], (error, response) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log("Billing plan activated:", response);
+                    // Create a billing agreement
+                    const billingAgreementAttributes = {
+                        "name": "Weekly Subscription Agreement",
+                        "description": "Agreement for weekly subscription",
+                        "start_date": "2024-05-01T00:00:00Z",
+                        "plan": {
+                            "id": billingPlan.id
+                        },
+                        "payer": {
+                            "payment_method": "paypal"
+                        }
+                    };
+
+                    paypal.billingAgreement.create(billingAgreementAttributes, (error, billingAgreement) => {
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            console.log("Billing agreement created:", billingAgreement);
+                            // Redirect the user to PayPal for approval
+                            console.log("Redirect URL:", billingAgreement.links[0].href);
+                            res.json(billingAgreement)
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
 
 //////////////////////////// PLAN API //////////////////////////////////////
 route.get('/plan', (req, res) => {
@@ -53,7 +122,7 @@ route.post('/plan', (req, res) => {
     const { plan_name, no_meals, price, shipping_fee } = req.body;
     db.query('INSERT INTO `plans`(`plan_name`,`no_meals`,`price`,`shipping_fee`) VALUES (?,?,?,?)', [plan_name, no_meals, price, shipping_fee], (err, result) => {
         if (err) throw err;
-        res.json({ message: 'Plan added successfully', id: result.insertId });
+        res.json({ message: 'Plan added successfully', id: result.insertId, status: 200 });
     });
 });
 route.put('/plan/:id', (req, res) => {
@@ -62,14 +131,14 @@ route.put('/plan/:id', (req, res) => {
     console.log(id);
     db.query('UPDATE `plans` SET `plan_name` = ?, `no_meals` = ?, `price` = ?, `shipping_fee` = ? WHERE `id` = ?;', [plan_name, no_meals, price, shipping_fee, id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Plan updated successfully' });
+        res.json({ message: 'Plan updated successfully', status: 200 });
     });
 });
 route.delete('/plan/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM plans WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Plan deleted successfully' });
+        res.json({ message: 'Plan deleted successfully', status: 200 });
     });
 });
 
@@ -100,7 +169,7 @@ route.post('/nutrient', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Nutrient added successfully', id: result.insertId });
+            res.json({ message: 'Nutrient added successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -112,14 +181,14 @@ route.put('/nutrient/:id', (req, res) => {
     console.log(id);
     db.query('UPDATE `nutrients` SET `nutrient` = ?,nutrient_unit = ? WHERE `id` = ?;', [nutrient, nutrient_unit, id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Nutrient updated successfully' });
+        res.json({ message: 'Nutrient updated successfully', status: 200 });
     });
 });
 route.delete('/nutrient/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM nutrients WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Nutrient deleted successfully' });
+        res.json({ message: 'Nutrient deleted successfully', status: 200 });
     });
 });
 
@@ -147,7 +216,7 @@ route.post('/prefs', (req, res) => {
     const { pref } = req.body;
     db.query('INSERT INTO `prefernces`(`preference`) VALUES (?)', [pref], (err, result) => {
         if (err) throw err;
-        res.json({ message: 'Preference added successfully', id: result.insertId });
+        res.json({ message: 'Preference added successfully', id: result.insertId, status: 200 });
     });
 });
 route.put('/prefs/:id', (req, res) => {
@@ -156,14 +225,14 @@ route.put('/prefs/:id', (req, res) => {
     console.log(id);
     db.query('UPDATE `prefernces` SET `preference` = ? WHERE `id` = ?;', [pref, id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Preference updated successfully' });
+        res.json({ message: 'Preference updated successfully', status: 200 });
     });
 });
 route.delete('/prefs/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM prefernces WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Preference deleted successfully' });
+        res.json({ message: 'Preference deleted successfully', status: 200 });
     });
 });
 
@@ -192,7 +261,7 @@ route.post('/unit', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Units added successfully', id: result.insertId });
+            res.json({ message: 'Units added successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -204,14 +273,14 @@ route.put('/unit/:id', (req, res) => {
     console.log(id);
     db.query('UPDATE `units` SET `unit` = ?WHERE `id` = ?;', [unit, id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Unit updated successfully' });
+        res.json({ message: 'Unit updated successfully', status: 200 });
     });
 });
 route.delete('/unit/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM units WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Unit deleted successfully' });
+        res.json({ message: 'Unit deleted successfully', status: 200 });
     });
 });
 
@@ -240,7 +309,7 @@ route.post('/ingredient', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Ingredient added successfully', id: result.insertId });
+            res.json({ message: 'Ingredient added successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -256,7 +325,7 @@ route.put('/ingredient/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Ingredient updated successfully' });
+            res.json({ message: 'Ingredient updated successfully', status: 200 });
         }
     });
 });
@@ -264,7 +333,7 @@ route.delete('/ingredient/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM ingredients WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Ingredient deleted successfully' });
+        res.json({ message: 'Ingredient deleted successfully', status: 200 });
     });
 });
 ////////////////////////Ingredients API ENDS/////////////////////////////////////////////////
@@ -557,7 +626,7 @@ route.post('/dish', (req, res) => {
 
             }
 
-            res.json({ message: 'Dish added successfully', id: result.insertId });
+            res.json({ message: 'Dish added successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -582,9 +651,9 @@ route.put('/dish/:id', (req, res) => {
         else {
             db.query('DELETE FROM ingredients WHERE id = ?', [id], (err) => {
                 if (err) throw err;
-                res.json({ message: 'Ingredient deleted successfully' });
+                res.json({ message: 'Ingredient deleted successfully', status: 200 });
             });
-            res.json({ message: 'Dish updated successfully' });
+            res.json({ message: 'Dish updated successfully', status: 200 });
         }
     });
 });
@@ -592,7 +661,7 @@ route.delete('/dish/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM dish WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Dish deleted successfully' });
+        res.json({ message: 'Dish deleted successfully', status: 200 });
     });
 });
 
@@ -627,7 +696,7 @@ route.post('/dish_ingr', (req, res) => {
 
         });
     }
-    res.json({ message: 'Ingredients Assigned successfully' })
+    res.json({ message: 'Ingredients Assigned successfully', status: 200 })
 
 });
 route.put('/dish_ingr/:id', (req, res) => {
@@ -638,7 +707,7 @@ route.put('/dish_ingr/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Dish updated successfully' });
+            res.json({ message: 'Dish updated successfully', status: 200 });
         }
     });
 });
@@ -646,7 +715,7 @@ route.delete('/dish_ingr/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM dish_ingredients WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Dish deleted successfully' });
+        res.json({ message: 'Dish deleted successfully', status: 200 });
     });
 });
 ////DISH INGRE API END///////////////////////////////////
@@ -671,7 +740,7 @@ route.post('/user', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'User added successfully', id: result.insertId });
+            res.json({ message: 'User added successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -687,7 +756,7 @@ route.put('/user/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'User updated successfully' });
+            res.json({ message: 'User updated successfully', status: 200 });
         }
     });
 });
@@ -695,7 +764,7 @@ route.delete('/user/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM users WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'User deleted successfully' });
+        res.json({ message: 'User deleted successfully', status: 200 });
     });
 });
 ///////////////////////User API Ends////////////////////////
@@ -764,9 +833,9 @@ route.get('/customer/:id', (req, res) => {
 });
 // Create a new user
 route.post('/customer', (req, res) => {
-    const { user_id, first_name, last_name, address, address2, city, state, zipcode, phone_number, payment_method, card_verified,prefs } = req.body;
+    const { user_id, first_name, last_name, address, address2, city, state, zipcode, phone_number, payment_method, card_verified, prefs } = req.body;
     var pref = JSON.parse(prefs);
-    
+
     db.query('INSERT INTO `customers`(`user_id`,`first_name`,`last_name`,`address`,`address2`,`city`,`state`,`zipcode`,`phone_number`,`payment_method`,`card_verified`) VALUES (?,?,?,?,?,?,?,?,?,?,?)', [user_id, first_name, last_name, address, address2, city, state, zipcode, phone_number, payment_method, card_verified], (err, result) => {
         if (err) {
             res.json({ message: err, status: 500 })
@@ -783,7 +852,7 @@ route.post('/customer', (req, res) => {
                 });
 
             }
-            res.json({ message: 'Customer added successfully', id: result.insertId });
+            res.json({ message: 'Customer added successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -799,7 +868,7 @@ route.put('/customer/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Customer updated successfully' });
+            res.json({ message: 'Customer updated successfully', status: 200 });
         }
     });
 });
@@ -807,7 +876,7 @@ route.delete('/customer/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM customers WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Customer deleted successfully' });
+        res.json({ message: 'Customer deleted successfully', status: 200 });
     });
 });
 
@@ -886,16 +955,15 @@ route.get('/orders/:id', (req, res) => {
 });
 // Create a new user
 route.post('/orders', (req, res) => {
-    const { customer_id, order_from, order_to, plan_id, status, order_dish,dish_quantity, order_addon } = req.body;
-    // console.log(dish_dates);
-    
+    const { customer_id, order_from, order_to, plan_id, status, order_dish, order_addon } = req.body;
+    console.log(order_dish);
+
     var dishes = JSON.parse(order_dish);
-    console.log(dishes.length);
+
+    console.log(dishes[0]);
     var order_addons = JSON.parse(order_addon);
     console.log(order_addons.length);
-    var dish_quantiti = JSON.parse(dish_quantity);
-    console.log(dish_quantiti);
-    db.query('INSERT INTO `orders`(`customer_id`,`order_from`,`order_to`,`plan_id`,`status`) VALUES (?,?,?,?,?)', [customer_id, order_from, order_to, plan_id, status], (err, result) => {
+    db.query('INSERT INTO `orders`(`customer_id`,`order_from`,`order_to`,`plan_id`,`status`,`order_dishes`) VALUES (?,?,?,?,?,?)', [customer_id, order_from, order_to, plan_id, status,order_dish], (err, result) => {
         if (err) {
             res.json({ message: err, status: 500 })
         }
@@ -903,7 +971,7 @@ route.post('/orders', (req, res) => {
 
             for (var i = 0; i < dishes.length; i++) {
                 // console.log(dates[i]);
-                db.query('INSERT INTO `factor75`.`order_dishes` (`order_id`,`dish_id`,`dish_qty`) VALUES (?,?,?)', [result.insertId, dishes[i], dish_quantiti[i]], (err2, result2) => {
+                db.query('INSERT INTO `factor75`.`order_dishes` (`order_id`,`dish_id`,`dish_qty`) VALUES (?,?,?)', [result.insertId, dishes[i]['dish_id'], dishes[i]['quantity']], (err2, result2) => {
                     if (err2) {
                         res.json({ message: err, status: 500 })
                     }
@@ -923,7 +991,7 @@ route.post('/orders', (req, res) => {
                 });
 
             }
-            res.json({ message: 'Order Created successfully', id: result.insertId });
+            res.json({ message: 'Order Created successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -981,7 +1049,7 @@ route.put('/orders/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Order updated successfully' });
+            res.json({ message: 'Order updated successfully', status: 200 });
         }
     });
 });
@@ -995,7 +1063,7 @@ route.put('/order_status/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Customer updated successfully' });
+            res.json({ message: 'Customer updated successfully', status: 200 });
         }
     });
 });
@@ -1011,10 +1079,10 @@ route.delete('/orders/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM orders WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Order deleted successfully' });
+        res.json({ message: 'Order deleted successfully', status: 200 });
     });
 });
-route.put('/dish_orders/:id', (req, res) => {   
+route.put('/dish_orders/:id', (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     // console.log("UPDATE `users` SET `username` = '"+username+"' and email = '"+email+"' and password = '"+password+"' and user_type = '"+usertype+"' WHERE `id` = "+id+";");  
@@ -1024,7 +1092,7 @@ route.put('/dish_orders/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Order Status Updated successfully' });
+            res.json({ message: 'Order Status Updated successfully', status: 200 });
         }
     });
 });
@@ -1038,7 +1106,7 @@ route.put('/dish_orders/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Order Status Updated successfully' });
+            res.json({ message: 'Order Status Updated successfully', status: 200 });
         }
     });
 });
@@ -1046,7 +1114,14 @@ route.put('/dish_orders/:id', (req, res) => {
 
 
 route.get('/week', (req, res) => {
-    db.query('SELECT wm.*,d.id as dish_id,d.dish_name FROM factor75.week_dishes wd join dish d on d.id = wd.dish_id join weekly_menu wm on wm.id = wd.week_id;', (err, results) => {
+    db.query('SELECT * from weekly_menu where MONTH(dateto) = MONTH(CURRENT_DATE())  order by datefrom asc;', (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    });
+});
+route.get('/week_month/:id', (req, res) => {
+const { id } = req.params;
+    db.query('SELECT d.*,wd.id as p_id FROM `week_dishes` wd join dish d on wd.dish_id = d.id where wd.week_id = ?',[id], (err, results) => {
         if (err) throw err;
         res.json(results);
     });
@@ -1080,7 +1155,7 @@ route.post('/week', (req, res) => {
                 });
 
             }
-            res.json({ message: 'Week Meals successfully', id: result.insertId });
+            res.json({ message: 'Week Meals successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -1089,12 +1164,12 @@ route.post('/week', (req, res) => {
 });
 route.put('/week/:id', (req, res) => {
     const { id } = req.params;
-    const { label, datefrom, dateto, dishes} = req.body;
+    const { label, datefrom, dateto, dishes } = req.body;
     var dish = JSON.parse(dishes);
     console.log(dish.length);
     db.query('DELETE FROM week_dishes WHERE week_id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Week deleted successfully' });
+        res.json({ message: 'Week deleted successfully', status: 200 });
     });
     for (var i = 0; i < dish.length; i++) {
         console.log(dish[i]);
@@ -1110,7 +1185,7 @@ route.put('/week/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'Order Status Updated successfully' });
+            res.json({ message: 'Order Status Updated successfully', status: 200 });
         }
     });
 
@@ -1119,7 +1194,7 @@ route.delete('/week/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM weekly_menu WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Week deleted successfully' });
+        res.json({ message: 'Week deleted successfully', status: 200 });
     });
 });
 
@@ -1139,14 +1214,14 @@ route.get('/purchase/:id', (req, res) => {
 });
 // Create a new user
 route.post('/purchase', (req, res) => {
-    const { ingredient_id, purchased_on, rate, qty,total } = req.body;
-    db.query('INSERT INTO `factor75`.`purchasing` (`ing_id`,`pur_on`,`rate`,`qty`,`total`) VALUES (?,?,?,?,?)', [ingredient_id, purchased_on, rate, qty,total], (err, result) => {
+    const { ingredient_id, purchased_on, rate, qty, total } = req.body;
+    db.query('INSERT INTO `factor75`.`purchasing` (`ing_id`,`pur_on`,`rate`,`qty`,`total`) VALUES (?,?,?,?,?)', [ingredient_id, purchased_on, rate, qty, total], (err, result) => {
         if (err) {
             res.json({ message: err, status: 500 })
 
         }
         else {
-            res.json({ message: 'Purchase Added successfully', id: result.insertId });
+            res.json({ message: 'Purchase Added successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -1162,7 +1237,7 @@ route.put('/purchase/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'User updated successfully' });
+            res.json({ message: 'User updated successfully', status: 200 });
         }
     });
 });
@@ -1170,12 +1245,12 @@ route.delete('/purchase/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM purchasing WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Purchase deleted successfully' });
+        res.json({ message: 'Purchase deleted successfully', status: 200 });
     });
 });
 route.post('/login', (req, res) => {
-    const { email,password } = req.body;
-    db.query("SELECT * FROM factor75.users where email = ? and password = ?", [email,password], (err, results) => {
+    const { email, password } = req.body;
+    db.query("SELECT * FROM factor75.users where email = ? and password = ?", [email, password], (err, results) => {
         if (err) throw err;
         res.json(results);
     });
@@ -1196,14 +1271,14 @@ route.get('/promo/:id', (req, res) => {
 });
 // Create a new user
 route.post('/promo', (req, res) => {
-    const { promo_name, discount_per, valid_till} = req.body;
+    const { promo_name, discount_per, valid_till } = req.body;
     db.query('INSERT INTO `factor75`.`promo_codes` (`promo_name`,`discount_per`,`valid_till`) VALUES (?,?,?)', [promo_name, discount_per, valid_till], (err, result) => {
         if (err) {
             res.json({ message: err, status: 500 })
 
         }
         else {
-            res.json({ message: 'Promo Code Created successfully', id: result.insertId });
+            res.json({ message: 'Promo Code Created successfully', id: result.insertId, status: 200 });
 
         }
 
@@ -1219,7 +1294,7 @@ route.put('/promo/:id', (req, res) => {
             res.json({ message: err, status: 500 })
         }
         else {
-            res.json({ message: 'User updated successfully' });
+            res.json({ message: 'User updated successfully', status: 200 });
         }
     });
 });
@@ -1227,28 +1302,28 @@ route.delete('/promo/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM promo_codes WHERE id = ?', [id], (err) => {
         if (err) throw err;
-        res.json({ message: 'Promo Code deleted successfully' });
+        res.json({ message: 'Promo Code deleted successfully', status: 200 });
     });
 });
 
 
-route.get('/mail',(req,res)=>{
+route.get('/mail', (req, res) => {
     const mailOptions = {
         from: 'abdulsamadq67@gmail.com', // Sender address
         to: 'abdulsamadq67@gmail.com', // List of recipients
         subject: 'Hello ✔', // Subject line
         text: 'Hello world?', // Plain text body
         html: '<b>Hello world?</b>' // HTML body
-      };
-      
-      // Send mail with defined transport object
-      transporter.sendMail(mailOptions, (error, info) => {
+    };
+
+    // Send mail with defined transport object
+    transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-          return console.error('Error:', error);
+            return console.error('Error:', error);
         }
         res.json(true);
         console.log('Message sent: %s', info.messageId);
-      });
+    });
 });
 
 
@@ -1309,11 +1384,54 @@ route.get('/auth-login', (req, res, next) => {
 
 
 function logMessage() {
-    console.log('Cron job executed at:', new Date().toLocaleString());
-    }
+    db.query('SELECT p.plan_name,p.no_meals,p.shipping_fee,p.price,o.*,c.`user_id`,c.`first_name`,c.`last_name`,c.`address`,c.`address2`,c.`city`,c.`state`,c.`zipcode`,c.`phone_number`,c.`payment_method`,c.`card_verified` FROM factor75.orders o inner join plans p on p.id = o.plan_id inner join customers c on c.id = o.customer_id;', (err, results) => {
+        if (err) throw err;
+        for (var i = 0; i < results.length; i++) {
+            const today = new Date();
+            const todayYear = today.getFullYear();
+            const todayMonth = today.getMonth() + 1; // Adding 1 because getMonth() returns zero-based month (0 for January)
+            const todayDay = today.getDate();
 
-    cron.schedule('* * * * *', () => {
-        // logMessage();
-        });
+            // Format today's date as "YYYY-MM-DD"
+            const formattedToday = `${todayYear}-${todayMonth < 10 ? '0' : ''}${todayMonth}-${todayDay < 10 ? '0' : ''}${todayDay}`;
+
+            // Sample date to compare with (you can replace this with any other date)
+            const sampleDate = results[i]['order_to']; // Format: YYYY-MM-DD
+
+            // Check if the sample date is the same as today's date
+            if (formattedToday === sampleDate) {
+                console.log(results[i]);
+                // const formdata = new FormData();
+                // formdata.append("customer_id", results[i]["customer_id"]);
+                // formdata.append("order_from", results[i]["order_to"]);
+                // formdata.append("order_to", "2024-01-07");
+                // formdata.append("plan_id", results[i]["plan_id"]);
+                // formdata.append("status", results[i]["status"]);
+                // formdata.append("order_dish", "[{\"dish_id\" :2,\"quantity\" :3},{\"dish_id\":2, \"quantity\" :3}]");
+                // formdata.append("order_addon", "[1,5,6]");
+
+                // const requestOptions = {
+                //     method: "POST",
+                //     body: formdata,
+                //     redirect: "follow"
+                // };
+
+                // fetch("http://16.171.214.227/orders", requestOptions)
+                //     .then((response) => response.text())
+                //     .then((result) => console.log(result))
+                //     .catch((error) => console.error(error));
+                // console.log('The sample date is the same as today.');
+            } else {
+                // console.log('The sample date is different from today.');
+            }
+            // console.log(results[i]['order_to']);
+        }
+    });
+    console.log('Cron job executed at:', new Date().toLocaleString());
+}
+
+// cron.schedule('*/2 * * * *', () => {
+//     logMessage();
+// });
 
 module.exports = route;

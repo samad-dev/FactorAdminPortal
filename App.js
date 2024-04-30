@@ -8,6 +8,7 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const upload = require('express-fileupload');
 const dotenv = require('dotenv');
+const paypal = require('paypal-rest-sdk');
 
 
 dotenv.config({ path: "./config.env" });
@@ -48,4 +49,4 @@ app.use((err, req, res, next) => {
 const http = require("http").createServer(app);
 
 
-http.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
+http.listen(80, () => console.log(`Server running on port ${80}`));
