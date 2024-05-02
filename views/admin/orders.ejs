@@ -3,329 +3,529 @@
 <link rel="stylesheet" href="assets/vendor/daterangepicker/daterangepicker.css">
 
 <!-- Vector Map css -->
-<link rel="stylesheet"
-    href="assets/vendor/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10"></link>
-    <link href="assets/vendor/datatables.net-bs5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-fixedcolumns-bs5/css/fixedColumns.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-fixedheader-bs5/css/fixedHeader.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-select-bs5/css/select.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-    
+<link rel="stylesheet" href="assets/vendor/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+</link>
+<link href="assets/vendor/datatables.net-bs5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-fixedcolumns-bs5/css/fixedColumns.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-fixedheader-bs5/css/fixedHeader.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/datatables.net-select-bs5/css/select.bootstrap5.min.css" rel="stylesheet" type="text/css" />
+<link href="assets/vendor/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+
 
 <%- contentFor('body') %>
 
 <!-- end row -->
 
 <div class="row mt-5">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h1 class="header-title" class="mb-6"
-                    style="font-size: 20px;">Orders</h1>
-                <br>
-                <!-- <button type="button" class="btn btn-secondary"
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="header-title" class="mb-6" style="font-size: 20px;">Orders</h1>
+        <br>
+        <!-- <button type="button" class="btn btn-secondary"
                     data-bs-toggle="modal"
                     data-bs-target="#top-modal" onclick="clearModalFields()">Add</button>
                 <br>
                 <br> -->
 
-                <table id="basic-datatable"
-                    class="table table-striped nowrap row-border order-column w-100">
-                    <thead>
-                        <tr>
-                            <th>S NO#</th>
-                            <th>Plan Name</th>
-                            <th>No Of Meals</th>
-                            <th>Shipping Fee</th>
-                            <th>Price</th>
-                            <th>Order From</th>
-                            <th>Order To</th>
-                            <th>Status</th>
-                            <th>Customer Name</th>
-                            <th>Address 1</th>
-                            <th>Address 2</th>
-                            <th>City</th>
-                            <th>State</th>
-                            <th>Zipcode</th>
-                            <th>Phone Number</th>
-                            <th>Payment Method</th>
-                            <th>Card Verified</th>
-                            <th>Created At</th>
-                            <th>Updated At</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+        <table id="basic-datatable" class="table table-striped nowrap row-border order-column w-100">
+          <thead>
+            <tr>
+              <th>S NO#</th>
+              <th>Plan Name</th>
+              <th>No Of Meals</th>
+              <th>Shipping Fee</th>
+              <th>Price</th>
+              <th>Order From</th>
+              <th>Order To</th>
+              <th>Status</th>
+              <th>Customer Name</th>
+              <th>Address 1</th>
+              <th>Address 2</th>
+              <th>City</th>
+              <th>State</th>
+              <th>Zipcode</th>
+              <th>Phone Number</th>
+              <th>Payment Method</th>
+              <th>Card Verified</th>
+              <th>Created At</th>
+              <th>Updated At</th>
+              <th>Edit</th>
+              <th>View</th>
 
-                        </tr>
-                    </thead>
+            </tr>
+          </thead>
 
-                    <tbody>
+          <tbody>
 
-                    </tbody>
-                </table>
+          </tbody>
+        </table>
 
-            </div> <!-- end card body-->
-        </div> <!-- end card -->
-    </div><!-- end col-->
+      </div> <!-- end card body-->
+    </div> <!-- end card -->
+  </div><!-- end col-->
 </div> <!-- end row-->
 
-<div id="top-modal" class="modal fade" tabindex="-1" role="dialog"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="padding:10px 20px;">
-            <div class="modal-header">
-                <h4 class="modal-title" id="topModalLabel">Add Ingredient</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+<div id="survey_modal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" data-bs-scroll="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h5 class="modal-title" id="myModalLabel">Create Permit Type</h5> -->
+        <h5 class="modal-title" id="myModalLabel">
+          <h5 id="labelc">Order Details</h5>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="overflow: auto;height: 80vh;">
+
+        <div class="container-fluid">
+
+          <div class="row">
+
+            <div class="col-md-12" id="orderContainer">
+
+
+
             </div>
-            <div class="modal-body">
-                <br>
-                <label style="font-size: 16px;">Ingredient</label>
-                <input type="text" class="form-control" id="ingredient">
-                <br>
-                <label style="font-size: 16px;">Unit</label>
-        
-                    <select id="unit"class="form-control select2" data-toggle="select2">
-                </select>
-                <input type="hidden" id="hidden">
-                <br>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light"
-                    data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="submit()">Save
-                    changes</button>
-            </div>
+
+
+          </div>
+
         </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-    </div
+      </div><!-- /.modal-dialog -->
+    </div>
+    <div id="top-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="padding:10px 20px;">
+          <div class="modal-header">
+            <h4 class="modal-title" id="topModalLabel">Add Ingredient</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <br>
+            <label style="font-size: 16px;">Ingredient</label>
+            <input type="text" class="form-control" id="ingredient">
+            <br>
+            <label style="font-size: 16px;">Unit</label>
 
-    <%- contentFor('FooterJs') %>
+            <select id="unit" class="form-control select2" data-toggle="select2">
+            </select>
+            <input type="hidden" id="hidden">
+            <br>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="submit()">Save
+              changes</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div <%- contentFor('FooterJs') %> <!-- Vector Map js -->
 
-    <!-- Vector Map js -->
-    
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script src="assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="assets/vendor/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
-<script src="assets/vendor/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-<script src="assets/vendor/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js"></script>
-<script src="assets/vendor/datatables.net-fixedcolumns-bs5/js/fixedColumns.bootstrap5.min.js"></script>
-<script src="assets/vendor/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-<script src="assets/vendor/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-<script src="assets/vendor/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js"></script>
-<script src="assets/vendor/datatables.net-buttons/js/buttons.html5.min.js"></script>
-<script src="assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
-<script src="assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
-<script src="assets/vendor/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-<script src="assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
-<script src="assets/vendor/select2/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="assets/vendor/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="assets/vendor/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="assets/vendor/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js"></script>
+    <script src="assets/vendor/datatables.net-fixedcolumns-bs5/js/fixedColumns.bootstrap5.min.js"></script>
+    <script src="assets/vendor/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="assets/vendor/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="assets/vendor/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js"></script>
+    <script src="assets/vendor/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="assets/vendor/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+    <script src="assets/vendor/select2/js/select2.min.js"></script>
 
     <script>
-
-// $("#basic-datatable").DataTable({scrollY:300,scrollX:!0,scrollCollapse:!0,paging:!1,fixedColumns:!0}),
-$('document').ready(function(){
-    if ($.fn.DataTable.isDataTable('#basic-datatable')) {
-    $('#basic-datatable').DataTable().destroy();
-}
-
-$("#basic-datatable").DataTable({
-    keys: true,
-    scrollX:!0,scrollCollapse:!0,paging:!1,fixedColumns:!0,
-    language: {
-        paginate: {
-            previous: "<i class='ri-arrow-left-s-line'>",
-            next: "<i class='ri-arrow-right-s-line'>"
+      // $("#basic-datatable").DataTable({scrollY:300,scrollX:!0,scrollCollapse:!0,paging:!1,fixedColumns:!0}),
+      $('document').ready(function() {
+        // $('#survey_modal').modal('show');
+        if ($.fn.DataTable.isDataTable('#basic-datatable')) {
+          $('#basic-datatable').DataTable().destroy();
         }
-    },
-    drawCallback: function () {
-        $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
-    }
-});
-  fetch();
 
-})
+        $("#basic-datatable").DataTable({
+          keys: true,
+          scrollX: !0,
+          scrollCollapse: !0,
+          paging: !1,
+          fixedColumns: !0,
+          language: {
+            paginate: {
+              previous: "<i class='ri-arrow-left-s-line'>",
+              next: "<i class='ri-arrow-right-s-line'>"
+            }
+          },
+          drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
+          }
+        });
+        fetch();
+
+      })
 
 
-function submit(){
+      function submit() {
 
-var update_id = $('#hidden').val();
-alert(document.getElementById("ingredient").value);
-alert(document.getElementById("unit").value)
+        var update_id = $('#hidden').val();
+        alert(document.getElementById("ingredient").value);
+        alert(document.getElementById("unit").value)
 
-if(update_id == ""){
-var form = new FormData();
-    form.append("name", document.getElementById("ingredient").value);
-    form.append("unit", document.getElementById("unit").value);
-   
+        if (update_id == "") {
+          var form = new FormData();
+          form.append("name", document.getElementById("ingredient").value);
+          form.append("unit", document.getElementById("unit").value);
 
-    var settings = {
-        "url": "/ingredient",
-        "method": "POST",
-        "timeout": 0,
-        "processData": false,
-        "mimeType": "multipart/form-data",
-        "contentType": false,
-        "data": form
-    };
 
-    $.ajax({
-        ...settings,
-        statusCode: {
-            200: function(response) {
+          var settings = {
+            "url": "/ingredient",
+            "method": "POST",
+            "timeout": 0,
+            "processData": false,
+            "mimeType": "multipart/form-data",
+            "contentType": false,
+            "data": form
+          };
+
+          $.ajax({
+            ...settings,
+            statusCode: {
+              200: function(response) {
                 console.log(response);
                 console.log("Request was successful");
                 $('#top-modal').modal('hide');
-               fetch();
-             
+                fetch();
+
                 Swal.fire(
-                    'Success!',
-                    'Record Created Successfully',
-                    'success'
+                  'Success!',
+                  'Record Created Successfully',
+                  'success'
                 )
+              },
             },
-        },
-        success: function(data) {
-            // $('#myModal').reset();
-            // Additional success handling if needed
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            console.log(xhr)
-            Swal.fire(
+            success: function(data) {
+              // $('#myModal').reset();
+              // Additional success handling if needed
+            },
+            error: function(xhr, textStatus, errorThrown) {
+              console.log(xhr)
+              Swal.fire(
                 'Server Error!',
                 'Record Not Created',
                 'error'
-            )
-        }
-    });
-}
-else{
-    var form = new FormData();
-    form.append("name", document.getElementById("ingredient").value);
-    form.append("unit", document.getElementById("unit").value);
+              )
+            }
+          });
+        } else {
+          var form = new FormData();
+          form.append("name", document.getElementById("ingredient").value);
+          form.append("unit", document.getElementById("unit").value);
 
 
 
-    var settings = {
-        "url": "/ingredient/" + update_id, // Fixed the URL concatenation
-        "method": "PUT",
-        "timeout": 0,
-        "processData": false,
-        "mimeType": "multipart/form-data",
-        "contentType": false,
-        "data": form
-    };
+          var settings = {
+            "url": "/ingredient/" + update_id, // Fixed the URL concatenation
+            "method": "PUT",
+            "timeout": 0,
+            "processData": false,
+            "mimeType": "multipart/form-data",
+            "contentType": false,
+            "data": form
+          };
 
-    $.ajax({
-        ...settings,
-        success: function (data) {
-            console.log(data);
-            console.log("Request was successful");
-            $('#top-modal').modal('hide');
-            fetch();
-            Swal.fire(
+          $.ajax({
+            ...settings,
+            success: function(data) {
+              console.log(data);
+              console.log("Request was successful");
+              $('#top-modal').modal('hide');
+              fetch();
+              Swal.fire(
                 'Success!',
                 'Ingredient Updated Successfully',
                 'success'
-            );
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            console.log(xhr);
-            Swal.fire(
+              );
+            },
+            error: function(xhr, textStatus, errorThrown) {
+              console.log(xhr);
+              Swal.fire(
                 'Server Error!',
                 'Ingredient Not Updated',
                 'error'
-            );
+              );
+            }
+          });
         }
-    });
-        }
 
-}
+      }
 
-function edit(id){
-    clearModalFields()
-$('#top-modal').modal('show');
-$('#hidden').val(id);
+      function edit(id) {
+        clearModalFields()
+        $('#top-modal').modal('show');
+        $('#hidden').val(id);
 
-}
+      }
 
-function fetch(){
-var settings = {
-    "url": "/orders",
-    "method": "GET",
-    "timeout": 0,
-};
+      function fetch() {
+        var settings = {
+          "url": "/orders",
+          "method": "GET",
+          "timeout": 0,
+        };
 
-var selectField = $('#unit');
-selectField.append($('<option>', {
-      value: '',
-      text: 'Select an option'
-    })); 
-    
-    $.ajax({            
-         url: "/unit",
-        type: 'GET',
-        dataType: 'json',
-        success: function(response) {
-        $.each(response, function(index, data) {
+        var selectField = $('#unit');
         selectField.append($('<option>', {
-                                    value: data.id, // Assuming each record has an 'id' property
-                                    text: data.unit // Assuming each record has a 'name' property
-                                }));
-                                });
-                        }
+          value: '',
+          text: 'Select an option'
+        }));
 
-                    });
+        $.ajax({
+          url: "/unit",
+          type: 'GET',
+          dataType: 'json',
+          success: function(response) {
+            $.each(response, function(index, data) {
+              selectField.append($('<option>', {
+                value: data.id, // Assuming each record has an 'id' property
+                text: data.unit // Assuming each record has a 'name' property
+              }));
+            });
+          }
 
-var table = new DataTable('#basic-datatable');
-$.ajax(settings).done(function(response) {
-    console.log(response);
-    table.clear().draw();
-    $.each(response, function(index, data) {
-        table.row.add([
-            index + 1,
-            data.plan_name,
-            data.no_meals,
-            data.shipping_fee,
-            data.price,
-            data.order_from,
-            data.order_to,
-            data.status,
-            data.first_name+" "+ data.last_name,
-            data.address,
-            data.address2,
-            data.city,
-            data.state,
-            data.zipcode,
-            data.phone_number,
-            data.payment_method,
-            data.card_verified,
-            data.created_at,
-            data.updated_at,
-           
-            '<button type="button"id="edit" name="edit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"  onclick="edit(' +
-            data.id +
-            ')"  class="btn btn-soft-secondary "style="padding:5px 10px;" ><i class="ri ri-pencil-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
-            '<button type="button"id="edit" name="edit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"  onclick="delete_(' +
-            data.id +
-            ')"  class="btn btn-soft-danger "style="padding:5px 10px;" ><i class="ri  ri-delete-bin-2-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
-           
+        });
+
+        var table = new DataTable('#basic-datatable');
+        $.ajax(settings).done(function(response) {
+          console.log(response);
+          table.clear().draw();
+          $.each(response, function(index, data) {
+            table.row.add([
+              index + 1,
+              data.plan_name,
+              data.no_meals,
+              data.shipping_fee,
+              data.price,
+              data.order_from,
+              data.order_to,
+              data.status,
+              data.first_name + " " + data.last_name,
+              data.address,
+              data.address2,
+              data.city,
+              data.state,
+              data.zipcode,
+              data.phone_number,
+              data.payment_method,
+              data.card_verified,
+              data.created_at,
+              data.updated_at,
+
+              '<button type="button"id="edit" name="edit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"  onclick="edit(' +
+              data.id +
+              ')"  class="btn btn-soft-secondary "style="padding:5px 10px;" ><i class="ri ri-pencil-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
+              '<button type="button"id="edit" name="edit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"  onclick="view_order_detail(' +
+              data.id +
+              ')"  class="btn btn-soft-info "style="padding:5px 10px;" ><i class="ri ri-eye-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
+
             ]).draw(false);
-    });
-});
-}
+          });
+        });
+      }
+
+      function view_order_detail(id) {
+        clearModalFields();
+        var settings = {
+          "url": "http://16.171.214.227/orders/" + id,
+          "method": "GET",
+          "timeout": 0,
+        };
+        $.ajax(settings).done(function(result) {
+          console.log(result)
+          if (Array.isArray(result)) {
+            result.forEach(order => {
+              // Append order information to a container element
+
+              var div = `<div class="card">
+                <div class="card-body">
 
 
-function clearModalFields() {
-    // Select all input, textarea, and select elements within the modal
-    $('#top-modal :input').each(function() {
-        var elementType = this.type;
-        var elementId = this.id;
-        $('.select2').val(null).trigger('change');
+                  <hr class="my-4">
 
-        // Handle different input types appropriately
-        switch (elementType) {
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div class="text-muted">
+                        <h5 class="font-size-16 mb-3">Order To:</h5>
+                        <h5 class="font-size-15 mb-2">Name : ${order.first_name} ${order.last_name}</h5>
+                        <p class="font-size-15 mb-2">Address : ${order.address}</p>
+                        <p class="font-size-15 mb-2">Contact : ${order.phone_number}</p>
+                        <p class="font-size-15 mb-2">City : ${order.city}</p>
+                        <p class="font-size-15 mb-2">Plan : ${order.plan_name}</p>
+                        <p class="font-size-15 mb-2">Meals per week : ${order.no_meals}</p>
+                        <p class="font-size-15 mb-2">Amount : ${order.price}</p>
+                        <p class="font-size-15 mb-2">Shippng Fee : ${order.shipping_fee}</p>
+                      </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-sm-6">
+                      <div class="text-muted text-sm-end">
+                        <div>
+                          <h5 class="font-size-15 mb-1">Order No:</h5>
+                          <p># ${order.id}</p>
+                        </div>
+                        <div class="mt-4">
+                          <h5 class="font-size-15 mb-1">Date:</h5>
+                          <p>${order.order_from} - ${order.order_to} </p>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <!-- end col -->
+                  </div>
+                  <!-- end row -->
+
+                  <div class="container-fluid">
+                    <div class="row"> <strong>Dishes</strong>`;
+
+              order.dishes.forEach(dish => {
+                div += `
+                    <div class="col-md-3">
+                        <div class="card">
+                            <img class="card-img-top img-fluid" src="${dish.image}" alt="${dish.dish_name}">
+                            <div class="card-body">
+                                <h4 class="card-title">${dish.dish_name}</h4>
+                                <p class="card-text">${dish.description}</p>
+                                <p class="card-text">Order Qty : ${dish.dish_qty}</p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Allergens: ${dish.allergens}</li>
+                            </ul>
+                        </div>
+                    </div>`;
+              });
+
+              div += `</div>
+              <div class="container-fluid">
+                    <div class="row"> <strong>Addons</strong>`;
+
+              order.add_on.forEach(dish => {
+                div += `
+                    <div class="col-md-3">
+                        <div class="card">
+                            <img class="card-img-top img-fluid" src="${dish.image}" alt="${dish.dish_name}">
+                            <div class="card-body">
+                                <h4 class="card-title">${dish.dish_name}</h4>
+                                <p class="card-text">${dish.description}</p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Allergens: ${dish.allergens}</li>
+                            </ul>
+                        </div>
+                    </div>`;
+              });
+
+              div += `</div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+              $('#orderContainer').append(div);
+
+              // Append each dish information
+
+
+
+            });
+          } else {
+            console.error("Unexpected response format:", result);
+          }
+
+        })
+        $('#survey_modal').modal('show');
+
+      }
+
+      function view_order_detailss(id) {
+        $('#orderContainer').empty();
+
+        if (id !== '') {
+          const myHeaders = new Headers();
+          myHeaders.append("Cookie", "connect.sid=s%3APixO-3UlATj0-ltEj4kqItsiV1eppPUD.ENUMX41sBHOzqBMfP0C4dZ5rBTZ9u7kc4Qkun8Yg%2Bes");
+
+          const requestOptions = {
+            method: "GET",
+            headers: myHeaders,
+            redirect: "follow"
+          };
+
+          fetch(`orders/${id}`, requestOptions)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then(result => {
+              if (Array.isArray(result)) {
+                result.forEach(order => {
+                  // Append order information to a container element
+                  $('#orderContainer').append(`
+                            <div class="order">
+                                <h3>${order.plan_name}</h3>
+                                <p>No. of Meals: ${order.no_meals}</p>
+                                <p>Shipping Fee: ${order.shipping_fee}</p>
+                                <!-- Add more information here as needed -->
+                            </div>
+                        `);
+
+                  // Append each dish information
+                  order.dishes.forEach(dish => {
+                    $('#orderContainer').append(`
+                                <div class="dish">
+                                    <h4>${dish.dish_name}</h4>
+                                    <p>Total Calories: ${dish.total_calories}</p>
+                                    <!-- Add more information here as needed -->
+                                </div>
+                            `);
+                  });
+
+                  // Append each add-on information
+                  order.add_on.forEach(addon => {
+                    $('#orderContainer').append(`
+                                <div class="addon">
+                                    <h4>${addon.dish_name}</h4>
+                                    <p>Total Calories: ${addon.total_calories}</p>
+                                    <!-- Add more information here as needed -->
+                                </div>
+                            `);
+                  });
+                });
+              } else {
+                console.error("Unexpected response format:", result);
+              }
+              $('#survey_modal').modal('show');
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+              // Handle the error (e.g., display an error message to the user)
+            });
+        }
+      }
+
+      function clearModalFields() {
+        // Select all input, textarea, and select elements within the modal
+        $('#top-modal :input').each(function() {
+          var elementType = this.type;
+          var elementId = this.id;
+          $('.select2').val(null).trigger('change');
+
+          // Handle different input types appropriately
+          switch (elementType) {
             case 'text':
             case 'number':
             case 'file':
@@ -333,60 +533,61 @@ function clearModalFields() {
             case 'textarea':
             case 'select':
             case 'select-2':
-                $('#' + elementId).val('');
-                break;
+              $('#' + elementId).val('');
+              break;
 
-            // Add more cases as needed for other input types
-        }
-    });
-}
-function delete_(id){
+              // Add more cases as needed for other input types
+          }
+        });
+      }
 
-Swal.fire({
-title: 'Are you sure?',
-text: 'You won\'t be able to revert this!',
-icon: 'warning',
-showCancelButton: true,
-confirmButtonColor: '#3085d6',
-cancelButtonColor: '#d33',
-confirmButtonText: 'Yes, delete it!'
-}).then((result) => {
-if (result.isConfirmed) {
-  // Perform the delete action here
-  var settings = {
-"url": "/user/"+id,
-"method": "DELETE",
-"timeout": 0,
-};
-$.ajax({
-    ...settings,
-    statusCode: {
-        200: function(response) {
-            console.log(response);
-            console.log("Request was successful");
-            $('#top-modal').modal('hide');
-           
-            fetch()
-            Swal.fire('Deleted!', 'Order Deleted Successfully!', 'success');
-        },
-    },
-    success: function(data) {
-        // $('#myModal').reset();
-        // Additional success handling if needed
-    },
-    error: function(xhr, textStatus, errorThrown) {
-        console.log(xhr)
-        Swal.fire(
-            'Server Error!',
-            'Order Not Deleted',
-            'error'
-        )
-    }
-});
+      function delete_(id) {
 
- 
-}
-});
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'You won\'t be able to revert this!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Perform the delete action here
+            var settings = {
+              "url": "/user/" + id,
+              "method": "DELETE",
+              "timeout": 0,
+            };
+            $.ajax({
+              ...settings,
+              statusCode: {
+                200: function(response) {
+                  console.log(response);
+                  console.log("Request was successful");
+                  $('#top-modal').modal('hide');
 
-}
-</script>
+                  fetch()
+                  Swal.fire('Deleted!', 'Order Deleted Successfully!', 'success');
+                },
+              },
+              success: function(data) {
+                // $('#myModal').reset();
+                // Additional success handling if needed
+              },
+              error: function(xhr, textStatus, errorThrown) {
+                console.log(xhr)
+                Swal.fire(
+                  'Server Error!',
+                  'Order Not Deleted',
+                  'error'
+                )
+              }
+            });
+
+
+          }
+        });
+
+      }
+    </script>
