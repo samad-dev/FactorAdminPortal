@@ -53,7 +53,7 @@
               <th>Card Verified</th>
               <th>Created At</th>
               <th>Updated At</th>
-              <th>Edit</th>
+              <!-- <th>Edit</th> -->
               <th>View</th>
 
             </tr>
@@ -325,9 +325,9 @@
               data.created_at,
               data.updated_at,
 
-              '<button type="button"id="edit" name="edit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"  onclick="edit(' +
-              data.id +
-              ')"  class="btn btn-soft-secondary "style="padding:5px 10px;" ><i class="ri ri-pencil-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
+            //   '<button type="button"id="edit" name="edit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"  onclick="edit(' +
+            //   data.id +
+            //   ')"  class="btn btn-soft-secondary "style="padding:5px 10px;" ><i class="ri ri-pencil-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
               '<button type="button"id="edit" name="edit" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"  onclick="view_order_detail(' +
               data.id +
               ')"  class="btn btn-soft-info "style="padding:5px 10px;" ><i class="ri ri-eye-fill font-size-16 align-middle" style="font-size:16px;"></i></button>',
@@ -340,7 +340,7 @@
       function view_order_detail(id) {
         clearModalFields();
         var settings = {
-          "url": "http://16.171.214.227/orders/" + id,
+          "url": "/orders/" + id,
           "method": "GET",
           "timeout": 0,
         };
