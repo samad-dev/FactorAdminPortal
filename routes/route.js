@@ -110,6 +110,8 @@ route.get('/plan', (req, res) => {
 
 
 
+
+
 route.get('/plan/:id', (req, res) => {
     const { id } = req.params;
     db.query('SELECT * FROM plans WHERE id = ?', [id], (err, results) => {
@@ -953,6 +955,64 @@ route.get('/orders/:id', (req, res) => {
         });
     }
 });
+
+route.get('/orders_cl/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('SELECT p.plan_name,p.no_meals,p.shipping_fee,p.price,o.*,c.`user_id`,c.`first_name`,c.`last_name`,c.`address`,c.`address2`,c.`city`,c.`state`,c.`zipcode`,c.`phone_number`,c.`payment_method`,c.`card_verified` FROM factor75.orders o inner join plans p on p.id = o.plan_id inner join customers c on c.id = o.customer_id WHERE o.customer_id = ? order by o.id desc limit 1', [id], async (err, results) => {
+        if (err) {
+            res.json({ message: err, status: 500 });
+        } else {
+            for (let a = 0; a < results.length; a++) {
+                const data = JSON.parse(JSON.stringify(results[a]));
+
+                try {
+                    const results2 = await querydishes(data.id);
+                    const results3 = await queryaddons(data.id);
+
+                    data.dishes = results2;
+                    data.add_on = results3;
+                    results[a] = data;
+                } catch (error) {
+                    res.json({ message: error, status: 500 });
+                    return;
+                }
+            }
+
+
+            res.json(results);
+        }
+    });
+    function querydishes(order_id) {
+        return new Promise((resolve, reject) => {
+            db.query(
+                'SELECT * FROM factor75.order_dishes od join dish d on d.id = od.dish_id where order_id =  ' + order_id,
+                (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                }
+            );
+        });
+    }
+    function queryaddons(order_id) {
+        return new Promise((resolve, reject) => {
+            db.query(
+                'SELECT * FROM factor75.order_addon od join dish d on d.id = od.add_on where order_id = ' + order_id,
+                (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                }
+            );
+        });
+    }
+});
+
+
 // Create a new user
 route.post('/orders', (req, res) => {
     const { customer_id, order_from, order_to, plan_id, status, order_dish, order_addon } = req.body;
@@ -997,6 +1057,7 @@ route.post('/orders', (req, res) => {
 
     });
 });
+
 route.put('/orders/:id', (req, res) => {
     const { id } = req.params;
     const { order_from, order_to, plan_id, status, order_dish, dish_quantity, order_addon } = req.body;
