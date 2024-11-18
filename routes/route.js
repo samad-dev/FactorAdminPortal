@@ -1261,7 +1261,7 @@ route.delete('/week/:id', (req, res) => {
 
 
 route.get('/purchase', (req, res) => {
-    db.query('Select * from purchasing', (err, results) => {
+    db.query('Select pu.*,i.ingredient from purchasing pu join ingredients i on i.id = pu.ing_id order by pur_on desc;', (err, results) => {
         if (err) throw err;
         res.json(results);
     });

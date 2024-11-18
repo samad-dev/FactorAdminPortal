@@ -150,6 +150,8 @@
 
             if (result.length > 0) {
               alert("Logged In Successfully");
+              localStorage.setItem("User", email);
+              // localStorage.setItem("scope", document.getElementById('login_scope').value);
               window.location.href = "/order";
 
 
