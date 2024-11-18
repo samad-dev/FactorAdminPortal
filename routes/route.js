@@ -882,6 +882,58 @@ route.delete('/customer/:id', (req, res) => {
     });
 });
 
+route.get('/zipcodes', (req, res) => {
+    db.query('Select * from zipcodes', (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    });
+});
+
+route.get('/zipcode/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('SELECT * FROM zipcodes WHERE id = ?', [id], (err, results) => {
+        if (err) throw err;
+        res.json(results[0]);
+    });
+});
+route.post('/zipcode', (req, res) => {
+    const { zipcode} = req.body;
+
+    db.query('INSERT INTO `zipcodes`( `zipcode`) VALUES (?)', [zipcode], (err, result) => {
+        if (err) {
+            res.json({ message: err, status: 500 })
+        }
+        else {
+            
+            res.json({ message: 'ZipCode added successfully', id: result.insertId, status: 200 });
+
+        }
+
+    });
+});
+
+route.put('/zipcode/:id', (req, res) => {
+    const { id } = req.params;
+    const { zipcode, status} = req.body;
+    // console.log("UPDATE `users` SET `username` = '"+username+"' and email = '"+email+"' and password = '"+password+"' and user_type = '"+usertype+"' WHERE `id` = "+id+";");  
+    db.query('UPDATE `factor75`.`zipcodes` SET `zipcode` = "' + zipcode + '",`status` = "' + status + '" WHERE `id` = ' + id + ';', (err) => {
+        if (err) {
+
+            res.json({ message: err, status: 500 })
+        }
+        else {
+            res.json({ message: 'ZipCode updated successfully', status: 200 });
+        }
+    });
+});
+
+route.delete('/zipcode/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM zipcodes WHERE id = ?', [id], (err) => {
+        if (err) throw err;
+        res.json({ message: 'ZipCode deleted successfully', status: 200 });
+    });
+});
 
 route.get('/orders', (req, res) => {
     db.query('SELECT p.plan_name,p.no_meals,p.shipping_fee,p.price,o.*,c.`user_id`,c.`first_name`,c.`last_name`,c.`address`,c.`address2`,c.`city`,c.`state`,c.`zipcode`,c.`phone_number`,c.`payment_method`,c.`card_verified` FROM factor75.orders o inner join plans p on p.id = o.plan_id inner join customers c on c.id = o.customer_id;', (err, results) => {
@@ -1015,7 +1067,7 @@ route.get('/orders_cl/:id', (req, res) => {
 
 // Create a new user
 route.post('/orders', (req, res) => {
-    const { customer_id, order_from, order_to, plan_id, status, order_dish, order_addon } = req.body;
+    const { customer_id, order_from, order_to, plan_id, status, order_dish, order_addon,coupon_code,discounted_amount } = req.body;
     console.log(order_dish);
 
     var dishes = JSON.parse(order_dish);
@@ -1023,7 +1075,7 @@ route.post('/orders', (req, res) => {
     console.log(dishes[0]);
     var order_addons = JSON.parse(order_addon);
     console.log(order_addons.length);
-    db.query('INSERT INTO `orders`(`customer_id`,`order_from`,`order_to`,`plan_id`,`status`,`order_dishes`) VALUES (?,?,?,?,?,?)', [customer_id, order_from, order_to, plan_id, status,order_dish], (err, result) => {
+    db.query('INSERT INTO `orders`(`customer_id`,`order_from`,`order_to`,`plan_id`,`status`,`order_dishes`,coupon_code,discounted_amount) VALUES (?,?,?,?,?,?,?,?)', [customer_id, order_from, order_to, plan_id, status,order_dish,coupon_code,discounted_amount], (err, result) => {
         if (err) {
             res.json({ message: err, status: 500 })
         }
@@ -1364,6 +1416,240 @@ route.delete('/promo/:id', (req, res) => {
     db.query('DELETE FROM promo_codes WHERE id = ?', [id], (err) => {
         if (err) throw err;
         res.json({ message: 'Promo Code deleted successfully', status: 200 });
+    });
+});
+
+
+function generateCouponCode(length = 10) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
+
+route.post('/api/coupons/create', (req, res) => {
+    const { discount_type, discount_value, is_guest_only, validity_start, validity_end, usage_limit } = req.body;
+
+    // Validate input
+    if (!['percentage', 'fixed'].includes(discount_type)) {
+        return res.status(400).json({ message: 'Invalid discount type.' });
+    }
+
+    if (discount_value <= 0) {
+        return res.status(400).json({ message: 'Discount value must be greater than 0.' });
+    }
+
+    const code = generateCouponCode();
+
+    // Insert into database
+    const sql = `
+        INSERT INTO coupons (code, discount_type, discount_value, is_guest_only, validity_start, validity_end, usage_limit)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [
+        code,
+        discount_type,
+        discount_value,
+        is_guest_only ? 1 : 0,
+        validity_start,
+        validity_end,
+        usage_limit || 1
+    ];
+
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Failed to create coupon.' });
+        }
+
+        res.status(201).json({
+            message: 'Coupon created successfully.',
+            coupon: {
+                id: result.insertId,
+                code,
+                discount_type,
+                discount_value,
+                is_guest_only,
+                validity_start,
+                validity_end,
+                usage_limit
+            }
+        });
+    });
+});
+
+// API to validate a coupon
+route.post('/api/coupons/validate', (req, res) => {
+    const { code, cart_total } = req.body;
+
+    // Validate input
+    if (!code || typeof cart_total !== 'number' || cart_total <= 0) {
+        return res.status(400).json({ message: 'Invalid input. Provide a valid coupon code and cart total.' });
+    }
+
+    // Fetch coupon details from the database
+    const sql = `
+        SELECT *
+        FROM coupons
+        WHERE code = ?
+          AND validity_start <= NOW()
+          AND validity_end >= NOW()
+          AND usage_limit > times_used
+    `;
+
+    db.query(sql, [code], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database query failed.' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Coupon is invalid, expired, or has reached its usage limit.' });
+        }
+
+        const coupon = results[0];
+
+        // Additional validation for guest-only coupons
+        if (coupon.is_guest_only && req.user) {
+            return res.status(403).json({ message: 'This coupon is only valid for guest users.' });
+        }
+
+        // Calculate the discount
+        let discount = 0;
+        if (coupon.discount_type === 'percentage') {
+            discount = (cart_total * coupon.discount_value) / 100;
+        } else if (coupon.discount_type === 'fixed') {
+            discount = coupon.discount_value;
+        }
+
+        discount = Math.min(discount, cart_total); // Ensure discount doesn't exceed cart total
+
+        res.status(200).json({
+            message: 'Coupon is valid.',
+            discount,
+            coupon: {
+                code: coupon.code,
+                discount_type: coupon.discount_type,
+                discount_value: coupon.discount_value,
+                validity_start: coupon.validity_start,
+                validity_end: coupon.validity_end,
+                usage_limit: coupon.usage_limit,
+                times_used: coupon.times_used
+            }
+        });
+    });
+});
+
+// API to redeem a coupon
+route.post('/api/coupons/redeem', (req, res) => {
+    const { code, cart_total, user_id } = req.body;
+
+    // Validate input
+    if (!code || typeof cart_total !== 'number' || cart_total <= 0 || !user_id) {
+        return res.status(400).json({ message: 'Invalid input. Provide a valid coupon code, cart total, and user ID.' });
+    }
+
+    // Start a database transaction
+    db.beginTransaction(err => {
+        if (err) {
+            console.error('Transaction start failed:', err);
+            return res.status(500).json({ message: 'Failed to process the request.' });
+        }
+
+        // Fetch coupon details
+        const getCouponSql = `
+            SELECT *
+            FROM coupons
+            WHERE code = ?
+              AND validity_start <= NOW()
+              AND validity_end >= NOW()
+              AND usage_limit > times_used
+        `;
+
+        db.query(getCouponSql, [code], (err, results) => {
+            if (err) {
+                console.error(err);
+                return db.rollback(() => {
+                    res.status(500).json({ message: 'Failed to fetch coupon details.' });
+                });
+            }
+
+            if (results.length === 0) {
+                return db.rollback(() => {
+                    res.status(404).json({ message: 'Coupon is invalid, expired, or has reached its usage limit.' });
+                });
+            }
+
+            const coupon = results[0];
+
+            // Calculate the discount
+            let discount = 0;
+            if (coupon.discount_type === 'percentage') {
+                discount = (cart_total * coupon.discount_value) / 100;
+            } else if (coupon.discount_type === 'fixed') {
+                discount = coupon.discount_value;
+            }
+
+            discount = Math.min(discount, cart_total); // Ensure discount doesn't exceed cart total
+
+            // Update coupon usage
+            const updateCouponSql = `
+                UPDATE coupons
+                SET times_used = times_used + 1
+                WHERE id = ?
+            `;
+
+            db.query(updateCouponSql, [coupon.id], (err, updateResult) => {
+                if (err) {
+                    console.error(err);
+                    return db.rollback(() => {
+                        res.status(500).json({ message: 'Failed to update coupon usage.' });
+                    });
+                }
+
+                // Log the redemption
+                const logRedemptionSql = `
+                    INSERT INTO coupon_redemptions (user_id, coupon_id, cart_total, discount, redeemed_at)
+                    VALUES (?, ?, ?, ?, NOW())
+                `;
+
+                const redemptionData = [user_id, coupon.id, cart_total, discount];
+
+                db.query(logRedemptionSql, redemptionData, (err, logResult) => {
+                    if (err) {
+                        console.error(err);
+                        return db.rollback(() => {
+                            res.status(500).json({ message: 'Failed to log coupon redemption.' });
+                        });
+                    }
+
+                    // Commit the transaction
+                    db.commit(err => {
+                        if (err) {
+                            console.error('Transaction commit failed:', err);
+                            return db.rollback(() => {
+                                res.status(500).json({ message: 'Failed to process the request.' });
+                            });
+                        }
+
+                        res.status(200).json({
+                            message: 'Coupon redeemed successfully.',
+                            discount,
+                            final_total: cart_total - discount,
+                            coupon: {
+                                id: coupon.id,
+                                code: coupon.code,
+                                discount_type: coupon.discount_type,
+                                discount_value: coupon.discount_value
+                            }
+                        });
+                    });
+                });
+            });
+        });
     });
 });
 
