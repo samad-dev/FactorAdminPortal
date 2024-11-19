@@ -9,6 +9,7 @@
   "author": "coderthemes",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -18,6 +19,7 @@
     "express-ejs-layouts": "^2.5.1",
     "express-fileupload": "^1.4.0",
     "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.2",
     "mailtrap": "^3.2.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.6.5",
