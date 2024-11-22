@@ -1655,7 +1655,7 @@ route.post('/api/coupons/redeem', (req, res) => {
 
 
 route.get('/api/coupons',(req,res) => {
-    db.query('SELECT * FROM `coupons`', [id], (err, results) => {
+    db.query('SELECT * FROM `coupons`', (err, results) => {
         if (err) throw err;
         res.json(results[0]);
     });
