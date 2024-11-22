@@ -1662,9 +1662,9 @@ route.get('/api/coupons',(req,res) => {
 })
 route.delete('/api/coupons/:id',(req,res) => {
     const { id } = req.params;
-    db.query('SELECT * FROM `coupons` WHERE id = ?', [id], (err, results) => {
+    db.query('Delete FROM `coupons` WHERE id = ?', [id], (err, results) => {
         if (err) throw err;
-        res.json(results);
+        res.json({ message: 'Coupon Code deleted successfully', status: 200 });
     });
 })
 
