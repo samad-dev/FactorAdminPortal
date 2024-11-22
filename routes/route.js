@@ -900,6 +900,13 @@ route.get('/zipcodes/:zipcode', (req, res) => {
     const { zipcode } = req.params;
     db.query('SELECT * FROM zipcodes WHERE zipcode = ?', [zipcode], (err, results) => {
         if (err) throw err;
+        if(results.length>0)
+        {
+            res.json({message: "We Deliver Here"});
+        }
+        else{
+            res.json({message: "We Do Not Deliver Here"});
+        }
         res.json(results[0]);
     });
 });
