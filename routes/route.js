@@ -1654,6 +1654,13 @@ route.post('/api/coupons/redeem', (req, res) => {
 });
 
 
+route.get('/api/coupons',(req,res) => {
+    db.query('SELECT * FROM `coupons`', [id], (err, results) => {
+        if (err) throw err;
+        res.json(results[0]);
+    });
+})
+
 route.get('/mail', (req, res) => {
     const mailOptions = {
         from: 'abdulsamadq67@gmail.com', // Sender address
