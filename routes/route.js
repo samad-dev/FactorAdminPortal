@@ -3,8 +3,6 @@ const mysql = require('mysql2');
 const cron = require('node-cron');
 const route = express.Router();
 const paypal = require('paypal-rest-sdk');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -1362,57 +1360,14 @@ route.delete('/purchase/:id', (req, res) => {
         if (err) throw err;
         res.json({ message: 'Purchase deleted successfully', status: 200 });
     });
-}); 
+});
 route.post('/login', (req, res) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required' });
-    }
-
-    // Query the user from the database by email
-    db.query("SELECT * FROM factor75.users WHERE email = ?", [email], async (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Internal server error' });
-        }
-
-        if (results.length === 0) {
-            return res.status(401).json({ message: 'User not found' });
-        }
-
-        const user = results[0];
-
-
-        // Compare password with the stored hash
-        // const isMatch = await bcrypt.compare(password, user.password);
-
-        if (password != user.password) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
-
-        // Create a JWT token
-        // const token = jwt.sign(
-        //     { id: user.id, email: user.email },
-        //     process.env.JWT_SECRET, // You should store your secret key in an environment variable
-        //     { expiresIn: '1h' } // Token expiry time (1 hour in this case)
-        // );
-
-        // Send the response with the token
-        res.json({
-            message: 'Login successful',
-            id: user.id, email: user.email,
-            // token,
-        });
+    db.query("SELECT * FROM factor75.users where email = ? and password = ?", [email, password], (err, results) => {
+        if (err) throw err;
+        res.json(results);
     });
 });
-// route.post('/login', (req, res) => {
-//     const { email, password } = req.body;
-//     db.query("SELECT * FROM factor75.users where email = ? and password = ?", [email, password], (err, results) => {
-//         if (err) throw err;
-//         res.json(results);
-//     });
-// });
 
 route.get('/promo', (req, res) => {
     db.query('Select * from promo_codes', (err, results) => {
