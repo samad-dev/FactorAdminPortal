@@ -1660,6 +1660,13 @@ route.get('/api/coupons',(req,res) => {
         res.json(results);
     });
 })
+route.delete('/api/coupons/:id',(req,res) => {
+    const { id } = req.params;
+    db.query('SELECT * FROM `coupons` WHERE id = ?', [id], (err, results) => {
+        if (err) throw err;
+        res.json(results);
+    });
+})
 
 route.get('/mail', (req, res) => {
     const mailOptions = {
