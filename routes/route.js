@@ -1718,6 +1718,9 @@ route.get('/users', (req, res, next) => {
 route.get('/promo_code', (req, res, next) => {
     res.render('admin/promo_codes', { title: 'Promo Code' });
 })
+route.get('/zip_code', (req, res, next) => {
+    res.render('admin/zip_code', { title: 'Zip Code' });
+})
 route.get('/auth-login', (req, res, next) => {
     res.render('auth/auth-login', { title: 'Login In', layout: false })
 })

@@ -23,7 +23,7 @@
   <div class="col-12">
     <div class="card">
       <div class="card-body">
-        <h1 class="header-title" class="mb-6" style="font-size: 20px;">Coupon Code</h1>
+        <h1 class="header-title" class="mb-6" style="font-size: 20px;">Zip Code</h1>
         <br>
         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#top-modal" onclick="clearModalFields()">Add</button>
         <br>
@@ -33,7 +33,7 @@
           <thead>
             <tr>
               <th>S NO#</th>
-              <th>Coupon Code</th>
+              <th>Zip Code</th>
               <th>Status</th>
               <th>Created At</th>
               <th>Edit</th>
@@ -56,12 +56,12 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="padding:10px 20px;">
       <div class="modal-header">
-        <h4 class="modal-title" id="topModalLabel">Add Coupon Code</h4>
+        <h4 class="modal-title" id="topModalLabel">Add Zip Code</h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <br>
-        <label style="font-size: 16px;">Coupon Code</label>
+        <label style="font-size: 16px;">Zip Code</label>
         <input type="text" class="form-control" id="ingredient" required>
         <br>
         <label style="font-size: 16px;">Status</label>
@@ -192,7 +192,7 @@
           console.log(xhr)
           Swal.fire(
             'Server Error!',
-            'Coupon Code Not Created',
+            'Zip Code Not Created',
             'error'
           )
         }
@@ -223,7 +223,7 @@
           fetch();
           Swal.fire(
             'Success!',
-            'Coupon Code Updated Successfully',
+            'Zip Code Updated Successfully',
             'success'
           );
         },
@@ -231,7 +231,7 @@
           console.log(xhr);
           Swal.fire(
             'Server Error!',
-            'Coupon Code Not Updated',
+            'Zip Code Not Updated',
             'error'
           );
         }
@@ -369,7 +369,7 @@
               $('#top-modal').modal('hide');
 
               fetch()
-              Swal.fire('Deleted!', 'Coupon Code Deleted Successfully!', 'success');
+              Swal.fire('Deleted!', 'Zip Code Deleted Successfully!', 'success');
             },
           },
           success: function(data) {
@@ -380,7 +380,7 @@
             console.log(xhr)
             Swal.fire(
               'Server Error!',
-              'Coupon Code Not Deleted',
+              'Zip Code Not Deleted',
               'error'
             )
           }
