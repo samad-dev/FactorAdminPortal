@@ -207,28 +207,61 @@
     });
   }
 
-  function deleteCoupon(id) {
+  function delete_(id) {
+
     Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
+      title: 'Are you sure?',
+      text: 'You won\'t be able to revert this!',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
+        // Perform the delete action here
+        var settings = {
+          "url": "/api/coupons/" + id,
+          "method": "DELETE",
+          "timeout": 0,
+        };
         $.ajax({
-          url: `/api/coupons/delete/${id}`,
-          method: "DELETE",
-          success: function(response) {
-            Swal.fire("Deleted!", response.message, "success");
-            location.reload();
+          ...settings,
+          statusCode: {
+            200: function(response) {
+              console.log(response);
+              console.log("Request was successful");
+              $('#top-modal').modal('hide');
+
+              setTimeout(function() {
+
+                location.reload();
+
+
+              }, 2000);
+              Swal.fire('Deleted!', 'Coupon Code Deleted Successfully!', 'success');
+            },
+          },
+          success: function(data) {
+            // $('#myModal').reset();
+            // Additional success handling if needed
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            console.log(xhr)
+            Swal.fire(
+              'Server Error!',
+              'Coupon Code Not Deleted',
+              'error'
+            )
           }
         });
+
+
       }
     });
+
   }
+
 
   function clearModalFields() {
     $("#hiddenId").val("");
