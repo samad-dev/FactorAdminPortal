@@ -896,6 +896,13 @@ route.get('/zipcode/:id', (req, res) => {
         res.json(results[0]);
     });
 });
+route.get('/zipcodes/:zipcode', (req, res) => {
+    const { zipcode } = req.params;
+    db.query('SELECT * FROM zipcodes WHERE zipcode = ?', [zipcode], (err, results) => {
+        if (err) throw err;
+        res.json(results[0]);
+    });
+});
 route.post('/zipcode', (req, res) => {
     const { zipcode} = req.body;
 
